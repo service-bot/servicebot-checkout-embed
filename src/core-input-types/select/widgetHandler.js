@@ -1,7 +1,5 @@
 let handleConfig = {
     priceHandler : function(data, config){
-        // console.log('data',data);
-        // console.log("stuff", config.pricing.value);
         return (data && config.pricing.value) ? config.pricing.value[data.value] : 0;
     },
     validator : function(data, config){
