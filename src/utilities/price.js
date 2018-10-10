@@ -1,6 +1,4 @@
 import React from 'react';
-import getSymbolFromCurrency from 'currency-symbol-map'
-
 
 /**
  * This is used to display Stripe amount values,
@@ -22,31 +20,30 @@ function formatMoney(price, c, d, t){
 };
 
 let Price = function(props){
-    let price = formatMoney((props.value/100).toFixed(2),',','.');
-    let prefix = props.prefix || '$';
+    let formatter = new Intl.NumberFormat("en-US", { style: 'currency', currency: props.currency }).format;
+
     return(
-        <span>{prefix + price}</span>
+        <span>{formatter(Number(props.value/100))}</span>
     );
 };
 
 let getPrice = (myService, serviceType = null, metricProp)=>{
     let metricName = metricProp && metricProp.config.unit;
     let serType = myService.type || serviceType;
-    let prefix = getSymbolFromCurrency(myService.currency);
 
     if (serType === "subscription"){
         return (
             <span>
-                <Price value={myService.amount} prefix={prefix}/>
+                <Price value={myService.amount} currency={myService.currency}/>
                 <span>{myService.interval_count === 1 ? ' /' : ' / ' + myService.interval_count}{metricName && ` ${metricName} /`}{' '+myService.interval}</span>
             </span>
         );
     }else if (serType === "one_time"){
-        return (<span><Price value={myService.amount} prefix={prefix}/></span>);
+        return (<span><Price value={myService.amount} currency={myService.currency}/></span>);
     }else if (serType === "custom"){
         return false;
     } else{
-        return (<span><Price value={myService.amount} prefix={prefix}/></span>)
+        return (<span><Price value={myService.amount} currency={myService.currency}/></span>)
     }
 };
 /**

@@ -6,14 +6,13 @@ import {connect} from 'react-redux';
 import {formValueSelector, getFormValues} from 'redux-form'
 const REQUEST_FORM_NAME = "serviceInstanceRequestForm";
 const selector = formValueSelector(REQUEST_FORM_NAME); // <-- same as form name
-import getSymbolFromCurrency from 'currency-symbol-map'
 import {getPriceData} from "./core-input-types/client";
 
 
 
 function Summary(props){
     let self = this;
-    let {pricingPlan,metricProp, filteredAdjustments, rightHeading, prefix, total} = props;
+    let {pricingPlan,metricProp,currency, filteredAdjustments, rightHeading, prefix, total} = props;
     return (
         <div className="rf--summary-wrapper">
             <div className="rf--summary">
@@ -41,7 +40,7 @@ function Summary(props){
                             <div className="fe--total-price-wrapper">
                                 <div className="fe--total-price-label"><h5>Total:</h5></div>
                                 <div className="fe--total-price-value">
-                                    <Price value={total} prefix={prefix}/>
+                                    <Price value={total} currency={currency}/>
                                 </div>
                             </div>
                         </div>
@@ -195,10 +194,10 @@ class ServiceRequest extends React.Component {
         });
     }
 
-    getAdjustmentSign(adjustment, prefix) {
+    getAdjustmentSign(adjustment, currency) {
         switch (adjustment.operation) {
             case "subtract":
-                return <span>- <Price value={adjustment.value} prefix={prefix}/></span>;
+                return <span>- <Price value={adjustment.value} currency={currency}/></span>;
                 break;
             case "multiply":
                 return <span>+ %{adjustment.value}</span>;
@@ -207,7 +206,7 @@ class ServiceRequest extends React.Component {
                 return <span>- %{adjustment.value}</span>;
                 break;
             default:
-                return <span>+ <Price value={adjustment.value} prefix={prefix}/></span>;
+                return <span>+ <Price value={adjustment.value} currency={currency}/></span>;
         }
     }
 
@@ -231,7 +230,7 @@ class ServiceRequest extends React.Component {
                 return (<span>{error}</span>)
             }
 
-            let prefix = getSymbolFromCurrency(service.currency);
+
             let metricProp = formJSON && formJSON.references.service_template_properties.find(prop => prop.type === "metric")
             let isMetric = metricProp && metricProp.config.pricing && metricProp.config.pricing.tiers && metricProp.config.pricing.tiers.includes(selectedTier.name);
             let basePrice = isMetric ? 0 : pricingPlan && pricingPlan.amount;
@@ -242,7 +241,7 @@ class ServiceRequest extends React.Component {
                         <div
                             className="fe--line-item">{lineItem.prop_label}</div>
                         <div className="fe--line-item-price-value">
-                            {this.getAdjustmentSign(lineItem, prefix)}
+                            {this.getAdjustmentSign(lineItem, pricingPlan.currency)}
                         </div>
                     </div>
                 </div>
@@ -275,7 +274,6 @@ class ServiceRequest extends React.Component {
                 rightHeading,
                 pricingPlan,
                 filteredAdjustments,
-                prefix,
                 total
             };
             return (
@@ -286,7 +284,7 @@ class ServiceRequest extends React.Component {
                             <div className="rf--form-content">
                                 <div className="rf--basic-info">
                                 </div>
-                                <ServiceRequestForm summary={(<Summary {...summaryProps} metricProp={isMetric && metricProp}/>)} plan={pricingPlan} {...this.props} step={this.state.step} stepForward={this.stepForward} stepBack={this.stepBack} service={service}/>
+                                <ServiceRequestForm summary={(<Summary {...summaryProps} currency={pricingPlan.currency} metricProp={isMetric && metricProp}/>)} plan={pricingPlan} {...this.props} step={this.state.step} stepForward={this.stepForward} stepBack={this.stepBack} service={service}/>
                             </div>
                         </div>
                     </div>

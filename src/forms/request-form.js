@@ -13,7 +13,6 @@ import {connect} from "react-redux";
 import {RenderWidget, WidgetList, widgets, SelectWidget} from "../utilities/widgets";
 import {inputField, selectField, widgetField, priceField, ServicebotBaseForm, Fetcher} from "servicebot-base-form";
 import {CardSection} from "./billing-settings-form.js";
-import getSymbolFromCurrency from 'currency-symbol-map'
 
 import {Price} from "../utilities/price.js";
 import {required, email, numericality, length, confirmation} from 'redux-form-validators'
@@ -33,7 +32,7 @@ const selector = formValueSelector('serviceInstanceRequestForm'); // <-- same as
 
 //Custom property
 let renderCustomProperty = (props) => {
-    const {fields, formJSON, meta: {touched, error}} = props;
+    const {fields, currency, formJSON, meta: {touched, error}} = props;
     let widgets = getWidgets().reduce((acc, widget) => {
         acc[widget.type] = widget;
         return acc;
@@ -58,6 +57,7 @@ let renderCustomProperty = (props) => {
                                 type={formJSON[index].type}
                                 widget={property.widget}
                                 component={widgetField}
+                                currency={currency}
                                 label={formJSON[index].prop_label}
                                 // value={formJSON[index].data.value}
                                 formJSON={formJSON[index]}
@@ -129,7 +129,6 @@ class ServiceRequestForm extends React.Component {
         let getRequestText = () => {
             let serType = plan.type;
             let trial = plan.trial_period_days > 0;
-            let prefix = getSymbolFromCurrency(plan.currency);
             if(trial){
                 return ("Sign Up")
             }
@@ -180,6 +179,7 @@ class ServiceRequestForm extends React.Component {
 
                                 <FormSection name="references">
                                     <FieldArray name="service_template_properties" component={renderCustomProperty}
+                                                currency={plan.currency}
                                                 formJSON={formJSON.references.service_template_properties}/>
                                 </FormSection>
 
