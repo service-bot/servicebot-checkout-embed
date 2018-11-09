@@ -214,7 +214,7 @@ class ServiceRequest extends React.Component {
         if (this.state.loading) {
             return (<span></span>);
         } else {
-            let {formJSON, options, paymentStructureTemplateId} = this.props;
+            let {formJSON, options, paymentStructureTemplateId, googleScope} = this.props;
             let {service, error} = this.state;
             let selectedTier = null;
             let pricingPlan = service.references.tiers.reduce((acc, tier) => {

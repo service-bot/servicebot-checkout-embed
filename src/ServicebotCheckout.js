@@ -23,11 +23,21 @@ class App extends Component {
                   return state;
           }
       };
+      const oauthReducer = (state = {}, action) => {
+          switch(action.type){
+              case "SET_OAUTH" :
+                  return action.response;
+              default:
+                  return state;
+          }
+      };
+
 
       let store = createStore(combineReducers({
           options,
           loading : loadingReducer,
           form : formReducer,
+          oauthResponse: oauthReducer
       }));
 
       return (

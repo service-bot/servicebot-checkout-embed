@@ -124,8 +124,16 @@ class ServiceRequestForm extends React.Component {
     }
 
     render() {
-        const {handleSubmit, formJSON, emailOverride,token, googleClientId, helpers, error, step, plan, needsCard, setGoogleInformation} = this.props;
+        const {handleSubmit, formJSON, emailOverride,token, googleClientId, googleScope, helpers, error, step, plan, needsCard, setGoogleInformation, accessType} = this.props;
         const {price} = this.state;
+        let offlineJSON = {}
+        if(accessType === "offline"){
+            offlineJSON = {
+                accessType,
+                responseType:"code",
+                prompt: "consent"
+            }
+        }
         let getRequestText = () => {
             let serType = plan.type;
             let trial = plan.trial_period_days > 0;
@@ -165,17 +173,19 @@ class ServiceRequestForm extends React.Component {
                         <div className="rf--form-inner _step-0">
                             <div className="_heading-wrapper"><h2>{plan.type === "custom" ? "Contact" : "Sign Up"}</h2></div>
                             <div className="_content_wrapper">
-                                {helpers.setName && !formJSON.token && !token && <Field name="userName" type="text" component={inputField} validate={[required()]}/>}
-                                {!emailOverride && !formJSON.token && !token && <Field name="email" type="text" component={inputField}
-                                       label="Email Address" validate={[required(), email()]}/>}
+                                {accessType !== "offline" && <React.Fragment>
+                                    {helpers.setName && !formJSON.token && !token && <Field name="userName" type="text" component={inputField} validate={[required()]}/>}
+                                    {!emailOverride && !formJSON.token && !token && <Field name="email" type="text" component={inputField}
+                                           label="Email Address" validate={[required(), email()]}/>}
 
-                                {helpers.emailExists && "That email is in use"}
-                                {helpers.setPassword && plan.type !== "custom" && !formJSON.token && !token && <div>
-                                    <Field name="password" type="password" component={inputField} label="Password" validate={[length({min: 8}), required()]}/>
-                                    <Field name="password_confirmation" type="password" label="Password confirmation" component={inputField}
-                                           validate={[confirmation({ field: 'password', fieldLabel: 'Password' })]} />
+                                    {helpers.emailExists && "That email is in use"}
+                                    {helpers.setPassword && plan.type !== "custom" && !formJSON.token && !token && <div>
+                                        <Field name="password" type="password" component={inputField} label="Password" validate={[length({min: 8}), required()]}/>
+                                        <Field name="password_confirmation" type="password" label="Password confirmation" component={inputField}
+                                               validate={[confirmation({ field: 'password', fieldLabel: 'Password' })]} />
 
-                                </div>}
+                                    </div>}
+                                </React.Fragment>}
 
                                 <FormSection name="references">
                                     <FieldArray name="service_template_properties" component={renderCustomProperty}
@@ -190,7 +200,7 @@ class ServiceRequestForm extends React.Component {
                                 </div>
 
                                 {googleClientId && googleClientId.value && googleClientId.value.length > 0 && plan.type !== "custom" && !formJSON.token && !token && <div className={`google-login-container`}>
-                                    <span className={`_divider`}>Or</span>
+                                    {accessType !== "offline" && <span className={`_divider`}>Or</span>}
                                     <GoogleLogin
                                         disabledStyle={{}}
                                         className="google-button"
@@ -198,6 +208,8 @@ class ServiceRequestForm extends React.Component {
                                         buttonText="Sign up with Google"
                                         onSuccess={responseGoogle}
                                         onFailure={responseGoogle}
+                                        scope={googleScope || "profile email"}
+                                        {...offlineJSON}
                                     >
                                         <span className="google-button__icon">
                     <img src='data:image/svg+xml;utf8,<svg viewBox="0 0 366 372" xmlns="http://www.w3.org/2000/svg"><path d="M125.9 10.2c40.2-13.9 85.3-13.6 125.3 1.1 22.2 8.2 42.5 21 59.9 37.1-5.8 6.3-12.1 12.2-18.1 18.3l-34.2 34.2c-11.3-10.8-25.1-19-40.1-23.6-17.6-5.3-36.6-6.1-54.6-2.2-21 4.5-40.5 15.5-55.6 30.9-12.2 12.3-21.4 27.5-27 43.9-20.3-15.8-40.6-31.5-61-47.3 21.5-43 60.1-76.9 105.4-92.4z" id="Shape" fill="#EA4335"/><path d="M20.6 102.4c20.3 15.8 40.6 31.5 61 47.3-8 23.3-8 49.2 0 72.4-20.3 15.8-40.6 31.6-60.9 47.3C1.9 232.7-3.8 189.6 4.4 149.2c3.3-16.2 8.7-32 16.2-46.8z" id="Shape" fill="#FBBC05"/><path d="M361.7 151.1c5.8 32.7 4.5 66.8-4.7 98.8-8.5 29.3-24.6 56.5-47.1 77.2l-59.1-45.9c19.5-13.1 33.3-34.3 37.2-57.5H186.6c.1-24.2.1-48.4.1-72.6h175z" id="Shape" fill="#4285F4"/><path d="M81.4 222.2c7.8 22.9 22.8 43.2 42.6 57.1 12.4 8.7 26.6 14.9 41.4 17.9 14.6 3 29.7 2.6 44.4.1 14.6-2.6 28.7-7.9 41-16.2l59.1 45.9c-21.3 19.7-48 33.1-76.2 39.6-31.2 7.1-64.2 7.3-95.2-1-24.6-6.5-47.7-18.2-67.6-34.1-20.9-16.6-38.3-38-50.4-62 20.3-15.7 40.6-31.5 60.9-47.3z" fill="#34A853"/></svg>'/>
@@ -251,11 +263,15 @@ ServiceRequestForm = connect((state, ownProps) => {
 }, (dispatch) => {
     return {
         setGoogleInformation: (response) => {
-            let {email, name, googleId, } = response.profileObj;
-            dispatch(change("serviceInstanceRequestForm", `email`, email));
-            dispatch(change("serviceInstanceRequestForm", `userName`, name));
-            dispatch(change("serviceInstanceRequestForm", `token`, googleId));
-
+            dispatch({type: "SET_OAUTH", response});
+            if(!response.code) {
+                let {email, name, googleId,} = response.profileObj;
+                dispatch(change("serviceInstanceRequestForm", `email`, email));
+                dispatch(change("serviceInstanceRequestForm", `userName`, name));
+                dispatch(change("serviceInstanceRequestForm", `token`, googleId));
+            }else{
+                dispatch(change("serviceInstanceRequestForm", `code`, response.code));
+            }
 
             // dispatch(change("serviceInstanceRequestForm", `strategy`, "google"));
 
@@ -380,7 +396,7 @@ class ServiceInstanceForm extends React.Component {
         this.setState({serviceCreated: true});
         try {
             if (this.props.handleResponse) {
-                await this.props.handleResponse(response);
+                await this.props.handleResponse({...response, oauthResponse: this.props.oauthResponse});
             }
         }catch(e){
             console.error(e);
@@ -480,7 +496,7 @@ class ServiceInstanceForm extends React.Component {
                     handleFailure={this.handleFailure}
                     formName="serviceInstanceRequestForm"
                     helpers={helpers}
-                    formProps={{skippedStep0: this.state.skippedStep0, token: this.props.token, funds: this.state.funds, googleClientId: this.state.googleClientId, emailOverride: this.props.email, needsCard, summary: this.props.summary, plan: this.props.plan, step : this.props.step}}
+                    formProps={{googleScope: this.props.googleScope, skippedStep0: this.state.skippedStep0, token: this.props.token, funds: this.state.funds, googleClientId: this.state.googleClientId, emailOverride: this.props.email, needsCard, summary: this.props.summary, plan: this.props.plan, step : this.props.step}}
                     validations={this.formValidation}
                     loaderTimeout={false}
                     external={this.props.external}
@@ -506,7 +522,7 @@ let mapDispatchToProps = function(dispatch){
 
 
 ServiceInstanceForm = injectStripe(ServiceInstanceForm);
-ServiceInstanceForm = connect(null, mapDispatchToProps)(ServiceInstanceForm)
+ServiceInstanceForm = connect((state => ({oauthResponse: state.oauthResponse})), mapDispatchToProps)(ServiceInstanceForm)
 
 
 class ServicebotRequestForm extends React.Component {
