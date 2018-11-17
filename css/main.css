@@ -142,7 +142,7 @@ label {
   font-family: "Open Sans", "Arial";
 }
 
-input, .form-control {
+input, ._input- {
   color: #000;
   font-size: 16px;
   font-weight: 300;
@@ -439,7 +439,7 @@ input, .form-control {
   text-transform: uppercase;
   font-family: "Open Sans", "Arial";
 }
-.tiers ._tier-details input, .tiers ._tier-details .form-control {
+.tiers ._tier-details input, .tiers ._tier-details ._input- {
   color: #000;
   font-size: 16px;
   font-weight: 300;
@@ -1062,7 +1062,7 @@ input, .form-control {
   padding-left: 16px;
   padding-right: 16px;
 }
-.servicebot--embeddable .rf--form-wrapper .rf--form .rf--form-content .rf--form-elements .rf--body form .form-group .form-input-flex input.form-control.has-error {
+.servicebot--embeddable .rf--form-wrapper .rf--form .rf--form-content .rf--form-elements .rf--body form .form-group .form-input-flex input._input-.has-error {
   margin-bottom: 8px;
 }
 .servicebot--embeddable .rf--form-wrapper .rf--form .rf--form-content .rf--form-elements .rf--body form .form-group .form-input-flex .form-error {

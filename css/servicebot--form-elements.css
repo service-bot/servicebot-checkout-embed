@@ -32,12 +32,12 @@
     margin-bottom: 0;
 }
 /* Text input */
-.servicebot--embeddable input.form-control {
+.servicebot--embeddable input._input- {
     flex-basis: 70%;
     flex-grow: 1;
 }
 /* Select list */
-.servicebot--embeddable select.form-control{
+.servicebot--embeddable select._input-{
     color: grey;
     font-size: 16px;
     font-weight: 300;
@@ -220,16 +220,16 @@ form.mbf--funding-personal-info button[type="submit"] {
 
 
 /* form-control */
-.form-control.has-error{
+._input-.has-error{
     border-color: #ff6565;
 }
-.form-control.has-warning{
+._input-.has-warning{
     border-color: #ffc165;
 }
-.form-control.has-error:hover{
+._input-.has-error:hover{
     background-color: #ffefef;
 }
-.form-control.has-warning:hover{
+._input-.has-warning:hover{
     background-color: #fff1e8;
 }
 

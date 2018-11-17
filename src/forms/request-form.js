@@ -67,9 +67,9 @@ let renderCustomProperty = (props) => {
                     }else{
                         if(formJSON[index].data && formJSON[index].data.value && !formJSON[index].private){
                             return (
-                                <div className={`form-group form-group-flex`}>
-                                    {(formJSON[index].prop_label && formJSON[index].type !== 'hidden') && <label className="control-label form-label-flex-md">{formJSON[index].prop_label}</label>}
-                                    <div className="form-input-flex">
+                                <div className={`sb-form-group`}>
+                                    {(formJSON[index].prop_label && formJSON[index].type !== 'hidden') && <label className="_label-">{formJSON[index].prop_label}</label>}
+                                    <div className="_input-container-">
                                         <p>{formJSON[index].data.value}</p>
                                     </div>
                                 </div>)
