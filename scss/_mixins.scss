@@ -43,12 +43,12 @@
 /* form */
 @mixin _formGroup($direction){
 
-  .form-group.form-group-flex {
+  .sb-form-group {
     width: 100%;
     flex-direction: $direction;
 
     @if($direction == 'column') {
-      .form-label-flex-md{
+      ._label-{
         flex-basis: auto;
       }
     }
@@ -73,7 +73,7 @@
   }
 }
 @mixin _formInput{
-  input, .form-control{
+  input, ._input-{
     color: $color-black;
     font-size: 16px;
     font-weight: 300;

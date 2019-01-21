@@ -50,7 +50,7 @@ $embed-min-height: 300px;
 
     }
 
-    .p-20 p {
+    p {
       padding: 20px 50px;
       line-height: 25px;
       text-align: center;
@@ -188,9 +188,14 @@ $embed-min-height: 300px;
                   text-transform: none;
                 }
 
-                .form-input-flex {
+                ._input-container- {
                   display: flex;
                   flex-direction: column;
+
+                  &.has-error{
+                    margin-bottom: 0;
+                    border-color: $color-error;
+                  }
 
                   input {
                     font-size: 14px;
@@ -206,7 +211,7 @@ $embed-min-height: 300px;
                       right: $gutter;
                     }
 
-                    &.form-control {
+                    &._input- {
 
                       &.has-error {
                         margin: {

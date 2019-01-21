@@ -9,10 +9,10 @@ import PriceAdjustment from '../../widget-inputs/WidgetPriceAdjustment';
 
 let Tags = (props) => {
     return (
-        <div className="form-group form-group-flex addon-options-widget-config-input-wrapper">
-            <label className="control-label form-label-flex-md addon-options-widget-config-input-label">Available Options</label>
-            <div className="form-input-flex">
-                <TagsInput className="addon-options-widget-config-input react-tagsinput"
+        <div className="sb-form-group addon-options-widget">
+            <label className="_label-">Available Options</label>
+            <div className="_input-container-">
+                <TagsInput className="_input- __input-addon-options-widget react-tagsinput"
                     inputProps={{placeholder: 'Add Options'}} {...props.input} value={props.input.value || []}/>
             </div>
         </div>
@@ -85,10 +85,10 @@ class SelectPricing extends React.Component {
 let SelectWidget = (props) => {
     let {input, currency, configValue, label, meta: {touched, error, warning}} = props;
     return (
-        <div className={`form-group form-group-flex addon-options-widget-default-value-wrapper`}>
-            {label && <label className="control-label form-label-flex-md addon-options-widget-default-value-label">{label}</label>}
-            <div className="form-input-flex">
-                <select className={`form-control addon-options-widget-default-value-select${error && touched ? " has-error" : ""}`} {...input}>
+        <div className={`sb-form-group __addon-options-widget`}>
+            {label && <label className="_label-">{label}</label>}
+            <div className={`_input-container-${error && touched ? " has-error" : ""}`}>
+                <select className={`_input- __input-addon-options-widget${error && touched ? " has-error" : ""}`} {...input}>
                     <option key="0-default" value="">Choose One</option>
                     { configValue && configValue.value && configValue.value.map((option, index) => {
                             let price = configValue.pricing && configValue.pricing.value && configValue.pricing.value[option];

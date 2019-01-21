@@ -42,7 +42,7 @@ let RenderWidget = (props) => {
                            ]}/>
 
                         <div className="addon-widget-pricing-inputs-wrapper">
-                            <label className="control-label form-label-flex-md addon-widget-pricing-input-label">Add-On Pricing</label>
+                            <label className="_label- addon-widget-pricing-input-label">Add-On Pricing</label>
                             <Field name={`value`} configValue={configValue} currency={currency} component={widget.pricing}/>
                         </div>
                     </FormSection>

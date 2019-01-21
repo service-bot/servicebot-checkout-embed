@@ -61,7 +61,7 @@
 
 @mixin addon-options-widget-option{
 
-  .form-input-flex{
+  ._input-container-{
     border: 1px solid #6F7F9F;
     border-radius: 1px;
     height: 32px;
@@ -166,7 +166,7 @@
 }
 
 
-.addon-options-widget-default-value-wrapper{
+.__addon-options-widget{
   @include addon-options-widget-option;
 }
 .request-form-toggle-option-wrapper{
