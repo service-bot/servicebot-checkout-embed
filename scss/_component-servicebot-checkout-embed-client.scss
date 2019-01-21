@@ -6,10 +6,17 @@
   @include embed-text;
   font-weight: 600;
 }
+$embed-min-height: 300px;
 
 //Test commit
 
 .servicebot--rf-embeddable {
+  min-height: $embed-min-height;
+  box-sizing: content-box;
+
+  & * {
+    box-sizing: border-box;
+  }
 
   @include success-ui-default;
 
@@ -30,9 +37,11 @@
 
     @include text;
     @include border;
+    position: relative;
     border-radius: 3px;
     border-color: #0033A0;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
+    min-height: $embed-min-height;
     width: 384px;
     max-width: 100%;
     justify-content: space-around;
@@ -315,6 +324,23 @@
   text-align: right;
   color: $color-light-grey;
   padding: $gutter/2 0;
+
+  img{
+      height: 12px;
+      margin-bottom: -1px;
+      margin-left: 2px;
+  }
+}
+
+.page-loader{
+  &.servicebot-embed-custom-loader{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: white;
+    top: 0px;
+    left: 0px;
+  }
 }
 
 @include google-login;

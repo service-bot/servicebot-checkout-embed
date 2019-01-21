@@ -11,58 +11,15 @@ class Load extends React.Component {
         };
     }
 
-    componentDidMount() {
-        let self = this;
-        // if(this.props.timeout !== false ){
-        //     this.timeout = setTimeout(function(){
-        //         // self.setState({message: "There seems to be a problem in processing your request. Please try again.", loadState: "done" });
-        //     }, this.props.timeout || 10000);
-        // }
-    }
-
-    componentWillUnmount() {
-        clearTimeout(this.timeout);
-    }
-
     render () {
-
-        let style={};
-        let loadingStyle={};
-        if (this.state.type == 'content' || this.state.type == 'dataform'){
-            if(this.state.loadState == 'loading'){
-                loadingStyle={
-                    position: 'absolute',
-                    top: '50%',
-                    left: '47%',
-                    transform: 'translate(-50%,-50%)',
-                    height: '80px',
-                    width: '80px',
-                    zIndex: 999999
-                };
-            }
-        }else if(this.state.type == 'button'){
-            if(this.state.loadState == 'loading'){
-                loadingStyle={
-                    height: '20px',
-                    width: '20px'
-                };
-            }
-        }else if(this.state.type == 'avatar'){
-            if(this.state.loadState == 'loading'){
-                loadingStyle={
-                    height: '83px',
-                    width: '83px'
-                };
-            }
-        }
         if(this.props.loading){
             return (
-                <div className="page-loader">
+                <div className={`page-loader ${this.props.className}`}>
                     <div className="lds-ellipsis"><div/><div/><div/><div/></div>
                 </div>
             );
         }else{
-            return <div/>;
+            return <div className={`page-loader-done`}/>;
         }
     }
 }
