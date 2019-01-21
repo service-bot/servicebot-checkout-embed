@@ -332,11 +332,10 @@ $embed-min-height: 300px;
   }
 }
 
-.servicebot-embed-custom-loader{
-  &.page-loader{
+.page-loader{
+  &.servicebot-embed-custom-loader{
     position: absolute;
     height: 100%;
-    max-height: 100vh;
     width: 100%;
     background: white;
     top: 0px;
