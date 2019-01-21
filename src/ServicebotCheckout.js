@@ -44,7 +44,8 @@ class App extends Component {
       <div className="App">
       <Provider store={store}>
           <div>
-              <Load/>
+              {/* Initial embeddable loader, probably not needed */}
+              {/*<Load/>*/}
               <ServicebotRequest {...this.props}/>
           </div>
         </Provider>
