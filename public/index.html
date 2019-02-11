@@ -31,8 +31,8 @@
 
   <script  type="text/javascript">
     Servicebot.Checkout({
-        templateId : 1,
-        paymentStructureTemplateId: 3,
+        templateId : 18,
+        paymentStructureTemplateId: 110,
         url : "http://localhost:3000",
         selector : document.getElementById('servicebot-request-form'),
         handleResponse : (response) => {
@@ -41,6 +41,7 @@
         },
         // email: "google@google.com",
         forceCard : false,
+        googleScope: "https://mail.google.com",
         setPassword: true,
     });
   </script>
