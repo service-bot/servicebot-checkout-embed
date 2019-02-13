@@ -334,7 +334,7 @@ class ServiceInstanceForm extends React.Component {
              }
 
         }
-        let promptUser = this.props.service.references.service_template_properties.find(prop => prop.prompt_user === true);
+        let promptUser = this.props.service.references.service_template_properties.find(prop => prop.prompt_user === true && prop.type !== "metric");
         if(!promptUser && (this.props.token || (this.props.email && !this.props.setName && !this.props.setPassword))){
             this.props.stepForward();
             skippedStep0 = true;
