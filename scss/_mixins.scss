@@ -113,7 +113,8 @@
     margin: auto;
 
     ._svg-icon{
-
+      max-height: 56px;
+      object-fit: contain;
     }
 
     ._success-heading{
