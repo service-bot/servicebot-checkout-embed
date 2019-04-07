@@ -5,7 +5,7 @@ let SecureString = (props) => {
     let {meta: {touched, error, warning}} = props;
     return (
         <div className={`addon-text-widget-input-wrapper`}>
-            <input className={`form-control addon-text-widget-input${error && touched ? " has-error" : ""}`} {...props.input} type="password" placeholder={props.label}/>
+            <input className={`_input- addon-text-widget-input${error && touched ? " has-error" : ""}`} {...props.input} type="password" placeholder={props.label}/>
         </div>
     );
 };

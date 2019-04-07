@@ -32,7 +32,6 @@ class App extends Component {
           }
       };
 
-
       let store = createStore(combineReducers({
           options,
           loading : loadingReducer,

@@ -5,8 +5,8 @@ import {Elements, injectStripe, CardElement, StripeProvider} from 'react-stripe-
 class CardSection extends React.Component {
     render() {
         return (
-            <div className="form-group" id="card-element">
-                <h5>Payment Info</h5>
+            <div className="sb-form-group" id="card-element">
+                <label>Payment Info</label>
                 <CardElement style={{
                     base: {
                         color: '#32325d',

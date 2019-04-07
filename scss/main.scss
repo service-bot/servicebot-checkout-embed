@@ -14,7 +14,8 @@
 @import "_component-forms";
 
 /* servicebot-checkout-embed client -- for this repo project only! */
-@import "_component-servicebot-checkout-embed-client";
+// @import "_component-servicebot-checkout-embed-client";
+@import "_component-servicebot-checkout-embed-client-v2";
 
 img{
   @include text_muted;

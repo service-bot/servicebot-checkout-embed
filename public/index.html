@@ -22,7 +22,7 @@
     <title>React App</title>
 
   </head>
-  <body>
+  <body style="background: #f9f9f9">
   <div id="servicebot-request-form"></div>
   <div id="servicebot-login-form"></div>
 
@@ -30,19 +30,46 @@
   <script src="/build/servicebot-checkout-embed.js" type="text/javascript"></script>
 
   <script  type="text/javascript">
+    const BASIC = 65; const basic_pstid = 255; //Working fine
+    const UNIT = 67; const unit_pstid = 265; //Working fine
+    const FLAT_1_TIER = 61; const flat_1_tier_pstid = 233; //Working fine
+    const FLAT_2_TIERS = 62;
+    const FLAT_3_TIERS = 63;
+    const FLAT_4_TIERS = 64;
+    const FLAT_UNIT = 29; const flat_unit_pstid = 135; //TODO: OK but probably don't need to render Flat price
+    const UNIT_UNIT = 60;
+    const STEP_STEP = 32; const step_step_pstid = 163;
+    const STEP_STEP_CONTACT = 32; const step_step_contact_pstid = 161; // contact
+    const FLAT_UNIT_UNIT_STEP = 31;
+    const FLAT_UNIT_UNIT_STEP_GRAD_GRAD = 59; flat_unit_unit_step_grad_grad_pstid = 219;
+    const FLAT_UNIT_STEP_STEP = 33;
+    const FLAT_UNIT_STEP_STEP_GRADUATED = 42;
+    const FLAT_VOLUME = 34;
+    const VOLUME_VOLUME = 56; const vol_vol_pstid = 209; //Working fine, maybe hide the base price of $0
+    const VOLUME = 57;
+    const FLAT_GRADUATED = 35;
+    const GRADUATED = 49;
+    const GRADUATED_GRADUATED = 48; const grad_grad_pstid = 198; //Working fine, maybe hide the base price of $0
+    const VOLUME_GRADUATED = 58;
+    const FLAT_UNIT_UNIT_STEP_GRAD_GRAD_Vol = 59;
+
     Servicebot.Checkout({
-        templateId : 18,
-        paymentStructureTemplateId: 110,
+        templateId : FLAT_UNIT_UNIT_STEP_GRAD_GRAD,
+        paymentStructureTemplateId: flat_unit_unit_step_grad_grad_pstid,
         url : "http://localhost:3000",
         selector : document.getElementById('servicebot-request-form'),
         handleResponse : (response) => {
-            console.log(response);
+            
             //Response function, you can put redirect logic or app integration logic here
         },
         // email: "google@google.com",
         forceCard : false,
         googleScope: "https://mail.google.com",
-        setPassword: true,
+        setPassword: false,
+        //email: 'kalungsyasdf8@gmail.com',
+        propertyOverride: {
+          last_name: 'Sy'
+        }
     });
   </script>
   <noscript>
