@@ -91,43 +91,57 @@ const UnitPrice = (props) => {
 	return <span />;
 };
 const StepDescription = (props) => {
-	const { step, step: { tier_type }, interval, currency, tiers, tierIndex, intervalTiers } = props;
-
+	const { step, step: { unit_name, tier_type }, interval, currency, tiers, tierIndex, intervalTiers } = props;
+	console.log(props);
 	const CurrentIntervalStepPlan = {
 		...step,
 		...step.price.plans.filter((o) => {
 			return o.interval === interval;
 		})
 	};
-	const getLastTier = (currentTierIndex, intervalTiers, tiers) => {
-		// console.log("getLastTier", currentTierIndex, intervalTiers, tiers)
-		// const lastTierID = intervalTiers[currentTierIndex - 1].tier_id;
-		// const lastTier = tiers.filter((item) => {
-		// 	return item.id == lastTierID;
-		// });
-		// console.log("Found last tier", lastTier);
-        // return lastTier;
-        const lastTier = tiers.find(item=> {
-            return item.step[0].price.plans[0].tierIndex == currentTierIndex-1;
-        })
-        console.log("LAST TIER -- ", lastTier)
-        return lastTier;
+
+	const orderedTiers = tiers.sort((t1, t2) => {
+		const currentStepT1 = t1.step.find(s =>  {
+			return s.unit_name === unit_name; 
+		})
+		const currentStepT2 = t2.step.find(s =>  {
+			return s.unit_name === unit_name; 
+		})
+
+		console.log(currentStepT1, "CURRENT STEP!");
+		const upperLimitT1 = currentStepT1.price.plans[0].upperLimit;
+		const upperLimitT2 = currentStepT2.price.plans[0].upperLimit;
+		return upperLimitT1 - upperLimitT2;
+	})
+	const currentUpperLimit = step.price.plans[0].upperLimit;
+	const currentTierIndex = orderedTiers.findIndex(tier => {
+		const currentStep = tier.step.find(s =>  {
+			return s.unit_name === unit_name; 
+		})
+
+		return currentStep.price.plans[0].upperLimit === currentUpperLimit;
+	})
+	const getLastTier = (currentTierIndex, tiers) => {
+		if(currentTierIndex === 0){
+			return null
+		}
+		return orderedTiers[currentTierIndex - 1]
         
 	};
 	const upperLimit = numberWithCommas(CurrentIntervalStepPlan['0'].upperLimit);
 	//Get lower limit by tierIndex (the order of current tier passed into <Tier> by <ServicebotTiers>.)
 	const getRange = () => {
-		if (tierIndex === 0) {
+		if (currentTierIndex === 0) {
 			return `First ${upperLimit} `;
 		} else {
-			const lastTier = getLastTier(tierIndex, intervalTiers, tiers);
+			const lastTier = getLastTier(tierIndex, tiers);
 			console.log('LAST TIER', lastTier);
 			const lastTierlowerLimit = numberWithCommas(
 				lastTier.step.filter((item) => {
 					return item.unit_name == step.unit_name;
 				})[0].price.plans[0].upperLimit
 			);
-			if (tierIndex === tiers.length - 1 && upperLimit === 'Infinity') {
+			if (currentTierIndex === tiers.length - 1 && upperLimit === 'Infinity') {
 				return `Over ${lastTierlowerLimit} `;
 			} else {
 				return `${lastTierlowerLimit} - ${upperLimit} `;
