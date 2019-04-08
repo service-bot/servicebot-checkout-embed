@@ -112,7 +112,11 @@ $embed-min-height: 300px;
 		font-size: $fontSizeTableTitle;
 		line-height: 1.3em;
 		color: black;
-		margin-bottom: $gutter * 3;
+        margin-bottom: $gutter * 3;
+        
+        @include breakpoint(iPhone){
+            margin-bottom: $gutter*1.5;
+        }
 	}
 
 	.step-selectors {
@@ -141,11 +145,14 @@ $embed-min-height: 300px;
 			align-items: center;
 			align-content: center;
 			text-transform: uppercase;
-			font-size: 0.7em;
+			font-size: 0.8em;
 			line-height: 1.3em !important;
 
 			span {
-				padding: 3px 8px;
+                padding: 3px 8px;
+                @include breakpoint(iPhone){
+                    text-align: center;
+                }
 			}
 			&._active {
 				span {
@@ -210,14 +217,24 @@ $embed-min-height: 300px;
 							.rf--form-inner {
 								display: flex;
 								flex-direction: row;
-								padding-bottom: $gutter * 2;
+                                padding-bottom: $gutter * 2;
+                                
+                                @include breakpoint(iPhone){
+                                    flex-direction: column;
+                                    position: relative;
+                                }
 
 								._left {
 									flex-grow: 1;
 								}
 								._right {
 									max-width: 270px;
-									margin-left: $gutter;
+                                    margin-left: $gutter;
+                                    
+                                    @include breakpoint(iPhone){
+                                        max-width: 100%;
+                                        margin-left: 0;
+                                    }
 								}
 
 								._heading-wrapper {
@@ -230,12 +247,10 @@ $embed-min-height: 300px;
 									h2 {
 										font-size: 1em;
 										line-height: 24px;
-										//   text-align: center;
 										margin: 0;
 										color: black;
 										text-transform: none;
 										letter-spacing: 0.5px;
-										font-family: "Open Sans", "Arial";
 									}
 								}
 
@@ -251,17 +266,15 @@ $embed-min-height: 300px;
 									}
 
 									& > * {
-										// margin: $gutter/2 0;
 										padding: $gutter $gutter*1.5;
 									}
 
 									.rf--summary-heading {
 										h3 {
 											@include normalFont;
-											font-weight: bold;
+											font-weight: 600;
 											color: black;
 											margin: 0;
-											// margin-bottom: $gutter*1.5;
 										}
 									}
 
@@ -285,6 +298,10 @@ $embed-min-height: 300px;
 											}
 										}
 										.servicebot-pricing-breakdown._overview {
+                                            border-top: 1px solid #d9e0e6;
+                                            margin-top: 5px;
+                                            padding-top: 7px;
+
 											h2 {
 												display: none;
 											}
@@ -335,13 +352,17 @@ $embed-min-height: 300px;
 										display: flex;
 										justify-content: space-between;
 										// margin: $gutter/2 0;
-									}
+                                    }
+                                    
+                                    .fe--recurring-fee{
+                                        font-weight: bold;
+                                    }
 
 									.fe--base-price-value,
 									.fe--total-price-value {
 										//   @include embed-label;
 
-										font-weight: normal;
+										font-weight: bold;
 									}
 
 									.fe--total-price-wrapper {
@@ -359,7 +380,7 @@ $embed-min-height: 300px;
 										}
 
 										.fe--total-price-value {
-											padding: $gutter/2 $gutter;
+											// padding: $gutter/2 $gutter;
 											-webkit-border-radius: $gutter;
 											-moz-border-radius: $gutter;
 											border-radius: $gutter;
@@ -376,24 +397,49 @@ $embed-min-height: 300px;
 
 								&._step-0 {
 								}
+                                &._step-1{
+                                }
+                                &._step-2{
+                                }
 
-								&._step-1 {
+								&._step-1, &._step-2 {
+
+                                    .button-wrapper{
+                                        @include breakpoint(iPhone){
+                                            display: none;
+                                        }
+                                    }
+
+                                    .button-wrapper._mobile, .buttons._mobile{
+                                        display: none;
+
+                                        @include breakpoint(iPhone){
+                                            display: block;
+                                        }
+                                    }
 								}
 							}
 
 							.sb-form-group {
-								label {
+								._label-{
 									// @include embed-label;
 									text-transform: none;
-									font-size: 0.8em;
-									color: $colorSecondary;
+                                    font-size: 12px;
+                                    color: black;
+                                    font-weight: 600;
+									// color: $colorSecondary;
 								}
 
 								&.addon-checkbox-widget-default-value {
 									display: flex;
-								}
+                                }
+                                &.__addon-options-widget {
+                                    ._input-container-{
+                                        border-color: #ccd1d9;
+                                    }
+                                }
 								.iconToggleField {
-									border-color: $colorSecondary;
+									border-color: #ccd1d9;
 									border-width: 2px;
 									width: 1.2em;
 									height: 1.2em;
@@ -401,13 +447,20 @@ $embed-min-height: 300px;
 									.itf-icon {
 										transform: none;
 										border: none;
-										margin: 0;
+                                        margin: 0;
+                                        height: calc(100% - 2px);
+                                        width: calc(100% - 2px);
+                                        background-color: $colorPrimaryInverse !important;
+                                        position: absolute;
+                                        left: 1px;
+                                        top: 1px;
 									}
 
 									&.active {
+                                        border-color: $colorSecondary;
 										.itf-icon {
 											height: calc(100% - 2px);
-											width: calc(100% - 2px);
+                                            width: calc(100% - 2px);
 											background-color: $colorSecondary !important;
 											position: absolute;
 											left: 1px;

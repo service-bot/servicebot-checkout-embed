@@ -436,6 +436,9 @@ class ServiceRequestForm extends React.Component {
 								</div>
 							</div>
 							<div className="_right">{this.props.summary}</div>
+							<div className="button-wrapper _center _mobile">
+								<button className="buttons _primary _next">{`Continue to Payment`}</button>
+							</div>
 						</div>
 					)}
 					{step === 2 && (
@@ -445,9 +448,9 @@ class ServiceRequestForm extends React.Component {
 									<h2>Payment</h2>
 								</div>
 								<div className="_content_wrapper">
-                                {console.log("NEED CARD? ", needsCard)}
-                                    {needsCard && <CardSection />}
-                                    {!needsCard && <span>No payment information required.</span>}
+									{console.log('NEED CARD? ', needsCard)}
+									{needsCard && <CardSection />}
+									{!needsCard && <p>No payment information required.</p>}
 									<div className="button-wrapper _center _space-between">
 										{/* {!this.props.skippedStep0 && (
 											<button
@@ -469,6 +472,10 @@ class ServiceRequestForm extends React.Component {
 								</div>
 							</div>
 							<div className="_right">{this.props.summary}</div>
+
+							<button className="buttons _primary _mobile submit-request" type="submit" value="submit">
+								{getRequestText()}
+							</button>
 						</div>
 					)}
 					{typeof error == 'string' && <strong>{error}</strong>}
@@ -525,13 +532,15 @@ class ServiceInstanceForm extends React.Component {
 			hasCard: false,
 			loading: true,
 			hasFund: false,
-			step: 0
+            step: 0,
+            selectedAddons: 0,
 		};
 		this.closeUserLoginModal = this.closeUserLoginModal.bind(this);
 		this.updatePrice = this.updatePrice.bind(this);
 		this.submissionPrep = this.submissionPrep.bind(this);
 		this.handleResponse = this.handleResponse.bind(this);
-		this.handleFailure = this.handleFailure.bind(this);
+        this.handleFailure = this.handleFailure.bind(this);
+        this.setSelectedAddons = this.setSelectedAddons.bind(this);
 	}
 
 	async componentDidMount() {
@@ -589,7 +598,13 @@ class ServiceInstanceForm extends React.Component {
 		if (nextState.serviceCreated) {
 			// browserHistory.push(`/service-instance/${nextState.serviceCreated.id}`);
 		}
-	}
+    }
+    
+    setSelectedAddons(count){
+        this.setState({
+            selectedAddons: count, 
+        });
+    }
 
 	updatePrice(newPrice) {
 		let self = this;
@@ -607,6 +622,7 @@ class ServiceInstanceForm extends React.Component {
 	}
 
 	async submissionPrep(values) {
+        console.log("SubmissionPrep -- props, values", this.props, values);
 		if (this.state.step < 2 && this.props.plan.type !== 'custom') {
 			this.props.stepForward();
 			throw ''; //stop the form from actually submitting
@@ -618,7 +634,8 @@ class ServiceInstanceForm extends React.Component {
 				!this.state.hasCard &&
 				this.props.plan.trial_period_days <= 0) ||
 			this.props.forceCard ||
-			this.props.plan.type === 'split';
+            this.props.plan.type === 'split' ||
+            (this.props.plan.trial_period_days > 0 && false);
 		if (needsCard) {
 			let token = await this.props.stripe.createToken();
 			if (token.error) {
@@ -739,7 +756,9 @@ class ServiceInstanceForm extends React.Component {
 						needsCard,
 						summary: this.props.summary,
 						plan: this.props.plan,
-						step: this.props.step
+                        step: this.props.step,
+                        setSelectedAddons: this.setSelectedAddons,
+                        selectedAddons: this.state.selectedAddions
 					}}
 					validations={this.formValidation}
 					loaderTimeout={false}
