@@ -12,7 +12,7 @@ let Checkbox = (props) => {
                 <div className="_input-container-">
                     <div className="request-form-toggle-option-wrapper">
                     <OnOffToggleField faIcon="check" color="#0091EA" input={input} type="checkbox"/>
-                    {configValue && configValue.pricing && configValue.pricing.value && <PriceAdjustment currency={currency} price={configValue.pricing.value} operation={configValue.pricing.operation}/>}
+                    {configValue && configValue.pricing && configValue.pricing.value ? <PriceAdjustment currency={currency} price={configValue.pricing.value} operation={configValue.pricing.operation}/> : <React.Fragment/>}  
                     </div>
                     {/*<input className="form-control addon-checkbox-widget-default-value-input" {...props.input} type="checkbox"/>*/}
                 </div>
