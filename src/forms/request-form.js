@@ -281,7 +281,7 @@ class ServiceRequestForm extends React.Component {
 					) : (
 						<React.Fragment />
 					)}
-					{plan.type != 'custom' && (plan.trial_period_days > 0 && requestAddonsSelected.length) ? (
+					{plan.type != 'custom' && needsCard ? (
 						<li
 							className={`_step-selector ${step == 2 ? '_active' : ``}`}
 							onClick={() => {
@@ -495,7 +495,7 @@ class ServiceRequestForm extends React.Component {
 							/>
 						</div>
 					)}
-					{/*typeof error == 'string' && <strong>{error}</strong> //TODO: decide if this is needed. */}
+					{typeof error == 'string' && <strong>{error}</strong>}
 				</form>
 			</div>
 		);
@@ -650,6 +650,20 @@ class ServiceInstanceForm extends React.Component {
 					return item.data && item.data.value;
 				})
 			: [];
+
+		const needsCard =
+			(this.state.servicePrice > 0 &&
+				this.props.plan.type !== 'custom' &&
+				!this.state.hasCard &&
+				this.props.plan.trial_period_days <= 0) ||
+			(this.props.forceCard && !this.state.hasCard) ||
+			(this.state.servicePrice > 0 &&
+				this.props.plan.type !== 'custom' &&
+				!this.state.hasCard &&
+				this.props.plan.trial_period_days > 0 &&
+				requestAddonsSelected.length) ||
+            this.props.plan.type === 'split'; //split is an old type, no longer used, depreated.
+            
 		if (this.state.step < 1 && this.props.plan.type !== 'custom') {
 			this.props.stepForward();
 			if (!requestAddons.length) {
@@ -658,20 +672,13 @@ class ServiceInstanceForm extends React.Component {
 			}
 			throw ''; //stop the form from actually submitting
 		}
-		if (this.state.step == 1 && this.props.plan.trial_period_days > 0 && requestAddonsSelected.length) {
+		if (this.state.step == 1 && needsCard) {
 			console.log('submission prep -- step 1');
 			this.props.stepForward();
 			throw ''; //stop the form from actually submitting
 		}
 		this.props.setLoading({ is_loading: true, loading_id: 'submission_button' });
-		let needsCard =
-			(this.state.servicePrice > 0 &&
-				this.props.plan.type !== 'custom' &&
-				!this.state.hasCard &&
-				this.props.plan.trial_period_days <= 0) ||
-			this.props.forceCard ||
-			this.props.plan.type === 'split' ||
-			(this.props.plan.trial_period_days > 0 && false);
+
 		if (needsCard) {
 			let token = await this.props.stripe.createToken();
 			if (token.error) {

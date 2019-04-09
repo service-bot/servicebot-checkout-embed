@@ -101,33 +101,37 @@ const StepDescription = (props) => {
 	};
 
 	const orderedTiers = tiers.sort((t1, t2) => {
-		const currentStepT1 = t1.step.find(s =>  {
-			return s.unit_name === unit_name; 
-		})
-		const currentStepT2 = t2.step.find(s =>  {
-			return s.unit_name === unit_name; 
-		})
+		const currentStepT1 = t1.step.find((s) => {
+			return s.unit_name === unit_name;
+		});
+		const currentStepT2 = t2.step.find((s) => {
+			return s.unit_name === unit_name;
+		});
 
-		console.log(currentStepT1, "CURRENT STEP!");
+		console.log(currentStepT1, 'CURRENT STEP!');
 		const upperLimitT1 = currentStepT1.price.plans[0].upperLimit;
 		const upperLimitT2 = currentStepT2.price.plans[0].upperLimit;
 		return upperLimitT1 - upperLimitT2;
-	})
+	});
 	const currentUpperLimit = step.price.plans[0].upperLimit;
-	const currentTierIndex = orderedTiers.findIndex(tier => {
-		const currentStep = tier.step.find(s =>  {
-			return s.unit_name == unit_name; 
-		})
+	const currentTierIndex = orderedTiers.findIndex((tier) => {
+		const currentStep = tier.step.find((s) => {
+			return s.unit_name == unit_name;
+		});
 		return currentStep.price.plans[0].upperLimit == currentUpperLimit;
-	})
+	});
 	const getLastTier = (currentTierIndex, tiers) => {
-
-        console.log("getLastTie()", currentTierIndex, orderedTiers, orderedTiers[currentTierIndex], orderedTiers[currentTierIndex-1])
-		if(currentTierIndex === 0){
-			return null
+		console.log(
+			'getLastTie()',
+			currentTierIndex,
+			orderedTiers,
+			orderedTiers[currentTierIndex],
+			orderedTiers[currentTierIndex - 1]
+		);
+		if (currentTierIndex === 0) {
+			return null;
 		}
-		return orderedTiers[currentTierIndex - 1]
-        
+		return orderedTiers[currentTierIndex - 1];
 	};
 	const upperLimit = numberWithCommas(CurrentIntervalStepPlan['0'].upperLimit);
 	//Get lower limit by tierIndex (the order of current tier passed into <Tier> by <ServicebotTiers>.)
@@ -248,37 +252,39 @@ function Summary(props) {
 							) : null}
 							<div className="fe--base-price-value">{getPrice(pricingPlan, null, metricProp)}</div>
 						</div>
-					
-					{selectedTier.step &&
-						selectedTier.step.map((item, i) => {
-							return (
-								<StepDescription
-									key={i}
-									step={item}
-									interval={pricingPlan.interval}
-									currency={pricingPlan.currency}
-									tiers={preprocessedTiers}
-									tierIndex={tierIndex}
-								/>
-							);
-                        })}
-                        
-                        {arrayOfGraduatedVolume.length > 1 && (
-									<TablePricingSummary
-										arrayOfGraduatedVolume={arrayOfGraduatedVolume}
-										currentInterval={pricingPlan.interval}
+
+						{selectedTier.step &&
+							selectedTier.step.map((item, i) => {
+								return (
+									<StepDescription
+										key={i}
+										step={item}
+										interval={pricingPlan.interval}
+										currency={pricingPlan.currency}
+										tiers={preprocessedTiers}
+										tierIndex={tierIndex}
 									/>
-								)}
+								);
+							})}
+
+						{arrayOfGraduatedVolume.length > 1 && (
+							<TablePricingSummary
+								arrayOfGraduatedVolume={arrayOfGraduatedVolume}
+								currentInterval={pricingPlan.interval}
+							/>
+						)}
+					</div>
 				</div>
-                </div>
 				<div className="rf--summary-content">
 					{pricingPlan.trial_period_days > 0 ? (
-						<div className="rf--free-trial-content">{pricingPlan.trial_period_days} Day Free Trial</div>
+						<div className="rf--free-trial-content">
+							{pricingPlan.trial_period_days}{' '}
+							{`Day${pricingPlan.trial_period_days > 1 ? 's' : ''} Free Trial`}
+						</div>
 					) : null}
 					{pricingPlan.type === 'subscription' || pricingPlan.type === 'one_time' ? (
 						<div className="rf--pricing-content">
 							<div className="_advanced-metric-pricing">
-								
 								{//only displays if there is no flat pricing
 								selectedTier.step &&
 								!selectedTier.plan_flat && (
@@ -489,7 +495,8 @@ class ServiceRequest extends React.Component {
 			case 'subtract':
 				return (
 					<span>
-						<span>-</span><Price value={adjustment.value} currency={currency} />
+						<span>-</span>
+						<Price value={adjustment.value} currency={currency} />
 					</span>
 				);
 				break;
