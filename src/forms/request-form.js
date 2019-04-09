@@ -473,7 +473,7 @@ class ServiceRequestForm extends React.Component {
 							</button>
 						</div>
 					)}
-					{typeof error == 'string' && <strong>{error}</strong>}
+					{/*typeof error == 'string' && <strong>{error}</strong> //TODO: decide if this is needed. */ } 
 				</form>
 			</div>
 		);
