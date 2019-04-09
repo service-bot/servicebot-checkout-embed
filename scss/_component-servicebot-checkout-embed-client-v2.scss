@@ -132,7 +132,7 @@ $embed-min-height: 300px;
 			content: '>';
 			padding: $gutter/2 $gutter/2;
 			font-weight: normal;
-			transform: scaleY(1.6) translateX(-2px) translateY(-0.09px);
+			transform: scaleY(1.6) translateX(1px) translateY(-0.09px);
 		}
 
 		> :last-child::after {

@@ -91,7 +91,7 @@ const UnitPrice = (props) => {
 	return <span />;
 };
 const StepDescription = (props) => {
-	const { step, step: { unit_name, tier_type }, interval, currency, tiers, tierIndex, intervalTiers } = props;
+	const { step, step: { unit_name, tier_type }, interval, currency, tiers, tierIndex } = props;
 	console.log(props);
 	const CurrentIntervalStepPlan = {
 		...step,
@@ -116,12 +116,13 @@ const StepDescription = (props) => {
 	const currentUpperLimit = step.price.plans[0].upperLimit;
 	const currentTierIndex = orderedTiers.findIndex(tier => {
 		const currentStep = tier.step.find(s =>  {
-			return s.unit_name === unit_name; 
+			return s.unit_name == unit_name; 
 		})
-
-		return currentStep.price.plans[0].upperLimit === currentUpperLimit;
+		return currentStep.price.plans[0].upperLimit == currentUpperLimit;
 	})
 	const getLastTier = (currentTierIndex, tiers) => {
+
+        console.log("getLastTie()", currentTierIndex, orderedTiers, orderedTiers[currentTierIndex], orderedTiers[currentTierIndex-1])
 		if(currentTierIndex === 0){
 			return null
 		}
@@ -258,7 +259,6 @@ function Summary(props) {
 									currency={pricingPlan.currency}
 									tiers={preprocessedTiers}
 									tierIndex={tierIndex}
-									intervalTiers={preprocessedTiers}
 								/>
 							);
                         })}
@@ -626,7 +626,7 @@ class ServiceRequest extends React.Component {
 						<div className={`rf--form`}>
 							{/*{JSON.stringify(this.getPriceData())}*/}
 							<h2 className="_app-heading">
-								<span>Create your Account</span>
+								<span>Create Your Account</span>
 							</h2>
 
 							<div className="rf--form-content">

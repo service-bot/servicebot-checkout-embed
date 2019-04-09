@@ -13,6 +13,8 @@ import values from 'object.values';
 import { GoogleLogin } from 'react-google-login';
 import Layout from '../layout';
 import Load from '../utilities/load';
+import { request } from 'http';
+import PreProcessors from '../PreProcessors';
 let _ = require('lodash');
 
 if (!Object.values) {
@@ -189,7 +191,8 @@ class ServiceRequestForm extends React.Component {
 			plan,
 			needsCard,
 			setGoogleInformation,
-			accessType
+            accessType,
+            requestAddonsSelected
 		} = this.props;
 
 		if (!plan) {
@@ -220,33 +223,19 @@ class ServiceRequestForm extends React.Component {
 			}
 		};
 
-		let buttonText = plan && plan.type !== 'custom' ? 'Continue to Addons' : 'Continue to Addons';
-		let checkoutText = plan && plan.trial_period_days > 0 ? 'Sign Up' : 'Pay Now';
+		
 		//Sort users and if user does not have name set, set it to the email value which will always be there
 		const responseGoogle = (response) => {
 			if (!response.error) {
 				setGoogleInformation(response);
 			}
 		};
-
-		const requestFields = formJSON.references.service_template_properties.filter((item) => {
-			if (!item.type) {
-				throw 'Error: items in formJSON.references.service_template_properties must contain the key `type` ';
-			}
-			//TODO: add checkboxes here if they are $0
-			//TODO: add selection here if all options are $0
-			return item.type === 'text' || item.type === 'secure-string';
-			// return true
-		});
-
-		const requestAddons = formJSON.references.service_template_properties.filter((item) => {
-			if (!item.type) {
-				throw 'Error: items in formJSON.references.service_template_properties must contain the key `type` ';
-			}
-			//TODO: make sure only select and checkbox of !$0 are added here
-			return item.type == 'select' || item.type == 'checkbox';
-		});
-
+        const requestFields = PreProcessors.getRequestFieldsArray.default(formJSON);
+		const requestAddons = PreProcessors.getRequestAddonsArray.default(formJSON);
+        let stepOneButtonText = plan && plan.type == 'custom' ? 'Submit Request' : (requestAddons.length ? 'Continue to Add-Ons' : 'Continue to Payment');
+        let stepTwoButtonText = (plan.trial_period_days > 0 && requestAddonsSelected.length > 0) ? 'Continue to Payment' : 'Complete Registration';
+        console.log("REQUEST ADDONS -- ", requestAddons, stepTwoButtonText)
+        
 		if (this.state.hasError) {
 			return <h1>There is an error!</h1>;
 		}
@@ -266,36 +255,40 @@ class ServiceRequestForm extends React.Component {
 							}
 						}}
 					>
-						<span>Account Setup</span>
+						<span>{plan.type != 'custom' ? 'Account Setup' : 'Contact Us'}</span>
 					</li>
-					<li
-						className={`_step-selector ${step == 1 ? '_active' : ``}`}
-						onClick={() => {
-							if (step != 1) {
-								const errors = this.props.handleSubmit();
+					{plan.type != 'custom' && requestAddons.length ? (
+						<li
+							className={`_step-selector ${step == 1 ? '_active' : ``}`}
+							onClick={() => {
+								if (step != 1) {
+									const errors = this.props.handleSubmit();
 
-								if (!errors.password && !errors.references) {
-									helpers.setStep(1);
+									if (!errors.password && !errors.references) {
+										helpers.setStep(1);
+									}
 								}
-							}
-						}}
-					>
-						<span>Additional Services</span>
-					</li>
-					<li
-						className={`_step-selector ${step == 2 ? '_active' : ``}`}
-						onClick={() => {
-							if (step != 2) {
-								const errors = this.props.handleSubmit();
+							}}
+						>
+							<span>Additional Services</span>
+						</li>
+					) : <React.Fragment/>}
+					{plan.type != 'custom' && (plan.trial_period_days > 0 && requestAddonsSelected.length) ? (
+						<li
+							className={`_step-selector ${step == 2 ? '_active' : ``}`}
+							onClick={() => {
+								if (step != 2) {
+									const errors = this.props.handleSubmit();
 
-								if (!errors.password && !errors.references) {
-									helpers.setStep(2);
+									if (!errors.password && !errors.references) {
+										helpers.setStep(2);
+									}
 								}
-							}
-						}}
-					>
-						<span>Payment Information</span>
-					</li>
+							}}
+						>
+							<span>Payment Information</span>
+						</li>
+					) : <React.Fragment/>}
 				</ul>
 				<form onSubmit={handleSubmit}>
 					{step === 0 && (
@@ -304,7 +297,9 @@ class ServiceRequestForm extends React.Component {
 								<div className="rf--form-inner _step-0">
 									<div className="_left">
 										<div className="_heading-wrapper">
-											<h2>{plan.type === 'custom' ? 'Contact' : 'Account Information'}</h2>
+											<h2>
+												{plan.type === 'custom' ? 'Contact Information' : 'Account Information'}
+											</h2>
 										</div>
 										<div className="_content_wrapper">
 											{accessType !== 'offline' && (
@@ -376,7 +371,7 @@ class ServiceRequestForm extends React.Component {
 											)}
 
 											<div className="button-wrapper _center">
-												<button className="buttons _primary _next">{buttonText}</button>
+												<button className="buttons _primary _next">{stepOneButtonText}</button>
 											</div>
 
 											{googleClientId &&
@@ -431,13 +426,13 @@ class ServiceRequestForm extends React.Component {
 										/>
 									</FormSection>
 									<div className="button-wrapper _center">
-										<button className="buttons _primary _next">{`Continue to Payment`}</button>
+										<button className="buttons _primary _next">{stepTwoButtonText}</button>
 									</div>
 								</div>
 							</div>
 							<div className="_right">{this.props.summary}</div>
 							<div className="button-wrapper _center _mobile">
-								<button className="buttons _primary _next">{`Continue to Payment`}</button>
+								<button className="buttons _primary _next">{stepTwoButtonText}</button>
 							</div>
 						</div>
 					)}
@@ -532,15 +527,15 @@ class ServiceInstanceForm extends React.Component {
 			hasCard: false,
 			loading: true,
 			hasFund: false,
-            step: 0,
-            selectedAddons: 0,
+			step: 0,
+			selectedAddons: 0
 		};
 		this.closeUserLoginModal = this.closeUserLoginModal.bind(this);
 		this.updatePrice = this.updatePrice.bind(this);
 		this.submissionPrep = this.submissionPrep.bind(this);
 		this.handleResponse = this.handleResponse.bind(this);
-        this.handleFailure = this.handleFailure.bind(this);
-        this.setSelectedAddons = this.setSelectedAddons.bind(this);
+		this.handleFailure = this.handleFailure.bind(this);
+		this.setSelectedAddons = this.setSelectedAddons.bind(this);
 	}
 
 	async componentDidMount() {
@@ -598,13 +593,13 @@ class ServiceInstanceForm extends React.Component {
 		if (nextState.serviceCreated) {
 			// browserHistory.push(`/service-instance/${nextState.serviceCreated.id}`);
 		}
-    }
-    
-    setSelectedAddons(count){
-        this.setState({
-            selectedAddons: count, 
-        });
-    }
+	}
+
+	setSelectedAddons(count) {
+		this.setState({
+			selectedAddons: count
+		});
+	}
 
 	updatePrice(newPrice) {
 		let self = this;
@@ -622,11 +617,24 @@ class ServiceInstanceForm extends React.Component {
 	}
 
 	async submissionPrep(values) {
-        console.log("SubmissionPrep -- props, values", this.props, values);
-		if (this.state.step < 2 && this.props.plan.type !== 'custom') {
-			this.props.stepForward();
+        console.log('SubmissionPrep -- props, values, formJSON', this.props, values, this.props.formJSON);
+        const requestAddons = PreProcessors.getRequestAddonsArray.default(this.props.formJSON);
+        const requestAddonsSelected = requestAddons ? requestAddons.filter(item=>{
+            return item.data && item.data.value
+        }) : [];
+		if (this.state.step < 1 && this.props.plan.type !== 'custom') {
+            this.props.stepForward();
+            if(!requestAddons.length){
+                console.log("submission prep triggered -- requestAddons", requestAddons)
+                this.props.stepForward();
+            }
 			throw ''; //stop the form from actually submitting
-		}
+        }
+        if(this.state.step == 1 && this.props.plan.trial_period_days > 0 && requestAddonsSelected.length){
+            console.log("submission prep -- step 1")
+            this.props.stepForward();
+            throw ''; //stop the form from actually submitting
+        }
 		this.props.setLoading(true);
 		let needsCard =
 			(this.state.servicePrice > 0 &&
@@ -634,8 +642,8 @@ class ServiceInstanceForm extends React.Component {
 				!this.state.hasCard &&
 				this.props.plan.trial_period_days <= 0) ||
 			this.props.forceCard ||
-            this.props.plan.type === 'split' ||
-            (this.props.plan.trial_period_days > 0 && false);
+			this.props.plan.type === 'split' ||
+			(this.props.plan.trial_period_days > 0 && false);
 		if (needsCard) {
 			let token = await this.props.stripe.createToken();
 			if (token.error) {
@@ -710,14 +718,21 @@ class ServiceInstanceForm extends React.Component {
 		};
 		let successMessage = this.props.message || 'Request Successful';
 		let successRoute = '/my-services';
-		//If admin requested, redirect to the manage subscription page
+        //If admin requested, redirect to the manage subscription page
+        console.log("Just before finding addons selected", this.props.formJSON);
+        const requestAddons = this.props.formJSON ? PreProcessors.getRequestAddonsArray.default(this.props.formJSON) : [];
+        const requestAddonsSelected = requestAddons ? requestAddons.filter(item=>{
+            return item.data && item.data.value
+        }) : [];
+        console.log("after finding addons selected", requestAddons, requestAddonsSelected);
 		let needsCard =
 			(this.state.servicePrice > 0 &&
 				this.props.plan.type !== 'custom' &&
 				!this.state.hasCard &&
 				this.props.plan.trial_period_days <= 0) ||
-			(this.props.forceCard && !this.state.hasCard) ||
-			this.props.plan.type === 'split';
+            (this.props.forceCard && !this.state.hasCard) ||
+            (this.state.servicePrice > 0 && this.props.plan.type !== 'custom' && !this.state.hasCard && this.props.plan.trial_period_days > 0 && requestAddonsSelected.length)||
+            this.props.plan.type === 'split';//split is an old type, no longer used, depreated.
 
 		let helpers = Object.assign(this.state, this.props);
 		helpers.updatePrice = self.updatePrice;
@@ -756,9 +771,8 @@ class ServiceInstanceForm extends React.Component {
 						needsCard,
 						summary: this.props.summary,
 						plan: this.props.plan,
-                        step: this.props.step,
-                        setSelectedAddons: this.setSelectedAddons,
-                        selectedAddons: this.state.selectedAddions
+						step: this.props.step,
+						requestAddonsSelected: requestAddonsSelected
 					}}
 					validations={this.formValidation}
 					loaderTimeout={false}

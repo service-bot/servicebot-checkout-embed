@@ -5,6 +5,7 @@
 */
 import {deepClone} from './ServicebotUtilities';
 import {APIVERSION} from './Constants';
+import { request } from 'http';
 
 //Adding flat to preprocessed tiers
 function addFlatPropToTiersV2(serviceTemplate, tiers){
@@ -249,6 +250,29 @@ function getCurrentIntervalTiers(paymentPlans, currentInterval, intervalArray){
     return currentIntervalTiers;
 }
 
+function getRequestFieldsArray(formJSON){
+    const requestFields = formJSON.references.service_template_properties.filter((item) => {
+        if (!item.type) {
+            throw 'Error: items in formJSON.references.service_template_properties must contain the key `type` ';
+        }
+        console.log("reqeustFields -- item ", item);
+        return item.config.pricing && item.config.pricing.value && item.prompt_user
+    });
+    return requestFields
+}
+
+function getRequestAddonsArray(formJSON){
+    const requestAddons = formJSON.references.service_template_properties.filter((item) => {
+        if (!item.type) {
+            throw 'Error: items in formJSON.references.service_template_properties must contain the key `type` ';
+        }
+        //TODO: make sure only select and checkbox of !$0 are added here
+        console.log("requestAddons -- item ", item);
+        return item.config.pricing && item.config.pricing.value && item.prompt_user
+    });
+    return requestAddons
+}
+
 //Takes an API JSON Response and returns what version the JSON is from.
 function whatVersion(JSONResponse){
     const metricProp = JSONResponse.references.service_template_properties.find(prop => prop.type === "metric");
@@ -300,7 +324,16 @@ const PreProcessors = {
     getArrayGraduatedVolume: {
         default: getArrayGraduatedVolumeV2,
         v2: getArrayGraduatedVolumeV2,
-    }
+    },
+    getRequestFieldsArray: {
+        default: getRequestFieldsArray,
+        v2: getRequestFieldsArray,
+    },
+    getRequestAddonsArray: {
+        default: getRequestAddonsArray,
+        v2: getRequestAddonsArray,
+    },
+    
 }
 
 export default PreProcessors;
