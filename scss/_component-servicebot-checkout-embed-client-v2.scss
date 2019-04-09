@@ -96,7 +96,11 @@ $embed-min-height: 300px;
 	position: relative;
 	display: flex;
 	flex-direction: row;
-	width: 100%;
+    width: 100%;
+    
+    ._button-loader:after{
+        background: $colorSecondaryBg;
+    }
 
 	&.servicebot--request-user-form-wrapper {
 		flex-direction: column;
@@ -421,7 +425,7 @@ $embed-min-height: 300px;
 							}
 
 							.sb-form-group {
-								._label-{
+								._label-, label{
 									// @include embed-label;
 									text-transform: none;
                                     font-size: 12px;
@@ -518,12 +522,13 @@ $embed-min-height: 300px;
 
 							button {
 								&.buttons {
+                                    @include button;
 									font-size: 14px;
 									font-weight: 600;
 									padding: 10px $gutter * 2;
 									background-color: $colorSecondaryBg;
 									color: $colorSecondary;
-									width: 100%;
+                                    width: 100%;
 								}
 
 								&._text {

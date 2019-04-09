@@ -15,6 +15,7 @@ import Layout from '../layout';
 import Load from '../utilities/load';
 import { request } from 'http';
 import PreProcessors from '../PreProcessors';
+import Button from '../Button';
 let _ = require('lodash');
 
 if (!Object.values) {
@@ -191,8 +192,8 @@ class ServiceRequestForm extends React.Component {
 			plan,
 			needsCard,
 			setGoogleInformation,
-            accessType,
-            requestAddonsSelected
+			accessType,
+			requestAddonsSelected
 		} = this.props;
 
 		if (!plan) {
@@ -223,19 +224,24 @@ class ServiceRequestForm extends React.Component {
 			}
 		};
 
-		
 		//Sort users and if user does not have name set, set it to the email value which will always be there
 		const responseGoogle = (response) => {
 			if (!response.error) {
 				setGoogleInformation(response);
 			}
 		};
-        const requestFields = PreProcessors.getRequestFieldsArray.default(formJSON);
+		const requestFields = PreProcessors.getRequestFieldsArray.default(formJSON);
 		const requestAddons = PreProcessors.getRequestAddonsArray.default(formJSON);
-        let stepOneButtonText = plan && plan.type == 'custom' ? 'Submit Request' : (requestAddons.length ? 'Continue to Add-Ons' : 'Continue to Payment');
-        let stepTwoButtonText = (plan.trial_period_days > 0 && requestAddonsSelected.length > 0) ? 'Continue to Payment' : 'Complete Registration';
-        console.log("REQUEST ADDONS -- ", requestAddons, stepTwoButtonText)
-        
+		let stepOneButtonText =
+			plan && plan.type == 'custom'
+				? 'Submit Request'
+				: requestAddons.length ? 'Continue to Add-Ons' : 'Continue to Payment';
+		let stepTwoButtonText =
+			plan.trial_period_days > 0 && requestAddonsSelected.length > 0
+				? 'Continue to Payment'
+				: 'Complete Registration';
+		console.log('REQUEST ADDONS -- ', requestAddons, stepTwoButtonText);
+
 		if (this.state.hasError) {
 			return <h1>There is an error!</h1>;
 		}
@@ -272,7 +278,9 @@ class ServiceRequestForm extends React.Component {
 						>
 							<span>Additional Services</span>
 						</li>
-					) : <React.Fragment/>}
+					) : (
+						<React.Fragment />
+					)}
 					{plan.type != 'custom' && (plan.trial_period_days > 0 && requestAddonsSelected.length) ? (
 						<li
 							className={`_step-selector ${step == 2 ? '_active' : ``}`}
@@ -288,7 +296,9 @@ class ServiceRequestForm extends React.Component {
 						>
 							<span>Payment Information</span>
 						</li>
-					) : <React.Fragment/>}
+					) : (
+						<React.Fragment />
+					)}
 				</ul>
 				<form onSubmit={handleSubmit}>
 					{step === 0 && (
@@ -371,7 +381,12 @@ class ServiceRequestForm extends React.Component {
 											)}
 
 											<div className="button-wrapper _center">
-												<button className="buttons _primary _next">{stepOneButtonText}</button>
+												<Button
+													text={stepOneButtonText}
+													className="buttons _primary _next"
+													loadingId="submission_button"
+												/>
+												{/* <button className="buttons _primary _next">{stepOneButtonText}</button> */}
 											</div>
 
 											{googleClientId &&
@@ -426,13 +441,25 @@ class ServiceRequestForm extends React.Component {
 										/>
 									</FormSection>
 									<div className="button-wrapper _center">
-										<button className="buttons _primary _next">{stepTwoButtonText}</button>
+										<Button
+											text={stepTwoButtonText}
+											className="buttons _primary _next"
+											type="submit"
+											value="submit"
+											loadingId="submission_button"
+										/>
 									</div>
 								</div>
 							</div>
 							<div className="_right">{this.props.summary}</div>
 							<div className="button-wrapper _center _mobile">
-								<button className="buttons _primary _next">{stepTwoButtonText}</button>
+								<Button
+									text={stepTwoButtonText}
+									className="buttons _primary _next"
+									type="submit"
+									value="submit"
+									loadingId="submission_button"
+								/>
 							</div>
 						</div>
 					)}
@@ -447,33 +474,28 @@ class ServiceRequestForm extends React.Component {
 									{needsCard && <CardSection />}
 									{!needsCard && <p>No payment information required.</p>}
 									<div className="button-wrapper _center _space-between">
-										{/* {!this.props.skippedStep0 && (
-											<button
-												onClick={helpers.stepBack}
-												className="buttons _primary _text submit-request"
-											>
-												Back
-											</button>
-										)} */}
-
-										<button
+										<Button
+											text={getRequestText()}
 											className="buttons _primary submit-request"
 											type="submit"
 											value="submit"
-										>
-											{getRequestText()}
-										</button>
+											loadingId="submission_button"
+										/>
 									</div>
 								</div>
 							</div>
 							<div className="_right">{this.props.summary}</div>
 
-							<button className="buttons _primary _mobile submit-request" type="submit" value="submit">
-								{getRequestText()}
-							</button>
+							<Button
+								text={getRequestText()}
+								className="buttons _primary _mobile submit-request"
+								type="submit"
+								value="submit"
+								loadingId="submission_button"
+							/>
 						</div>
 					)}
-					{/*typeof error == 'string' && <strong>{error}</strong> //TODO: decide if this is needed. */ } 
+					{/*typeof error == 'string' && <strong>{error}</strong> //TODO: decide if this is needed. */}
 				</form>
 			</div>
 		);
@@ -484,7 +506,8 @@ ServiceRequestForm = connect(
 	(state, ownProps) => {
 		return {
 			serviceTypeValue: selector(state, `type`),
-			formJSON: getFormValues('serviceInstanceRequestForm')(state)
+			formJSON: getFormValues('serviceInstanceRequestForm')(state),
+			is_loading: state.loading
 		};
 	},
 	(dispatch) => {
@@ -501,6 +524,9 @@ ServiceRequestForm = connect(
 				}
 
 				// dispatch(change("serviceInstanceRequestForm", `strategy`, "google"));
+			},
+			setLoading: (is_loading) => {
+				dispatch({ type: 'SET_LOADING', is_loading });
 			}
 		};
 	}
@@ -617,25 +643,27 @@ class ServiceInstanceForm extends React.Component {
 	}
 
 	async submissionPrep(values) {
-        console.log('SubmissionPrep -- props, values, formJSON', this.props, values, this.props.formJSON);
-        const requestAddons = PreProcessors.getRequestAddonsArray.default(this.props.formJSON);
-        const requestAddonsSelected = requestAddons ? requestAddons.filter(item=>{
-            return item.data && item.data.value
-        }) : [];
+		console.log('SubmissionPrep -- props, values, formJSON', this.props, values, this.props.formJSON);
+		const requestAddons = PreProcessors.getRequestAddonsArray.default(this.props.formJSON);
+		const requestAddonsSelected = requestAddons
+			? requestAddons.filter((item) => {
+					return item.data && item.data.value;
+				})
+			: [];
 		if (this.state.step < 1 && this.props.plan.type !== 'custom') {
-            this.props.stepForward();
-            if(!requestAddons.length){
-                console.log("submission prep triggered -- requestAddons", requestAddons)
-                this.props.stepForward();
-            }
+			this.props.stepForward();
+			if (!requestAddons.length) {
+				console.log('submission prep triggered -- requestAddons', requestAddons);
+				this.props.stepForward();
+			}
 			throw ''; //stop the form from actually submitting
-        }
-        if(this.state.step == 1 && this.props.plan.trial_period_days > 0 && requestAddonsSelected.length){
-            console.log("submission prep -- step 1")
-            this.props.stepForward();
-            throw ''; //stop the form from actually submitting
-        }
-		this.props.setLoading(true);
+		}
+		if (this.state.step == 1 && this.props.plan.trial_period_days > 0 && requestAddonsSelected.length) {
+			console.log('submission prep -- step 1');
+			this.props.stepForward();
+			throw ''; //stop the form from actually submitting
+		}
+		this.props.setLoading({ is_loading: true, loading_id: 'submission_button' });
 		let needsCard =
 			(this.state.servicePrice > 0 &&
 				this.props.plan.type !== 'custom' &&
@@ -718,21 +746,29 @@ class ServiceInstanceForm extends React.Component {
 		};
 		let successMessage = this.props.message || 'Request Successful';
 		let successRoute = '/my-services';
-        //If admin requested, redirect to the manage subscription page
-        console.log("Just before finding addons selected", this.props.formJSON);
-        const requestAddons = this.props.formJSON ? PreProcessors.getRequestAddonsArray.default(this.props.formJSON) : [];
-        const requestAddonsSelected = requestAddons ? requestAddons.filter(item=>{
-            return item.data && item.data.value
-        }) : [];
-        console.log("after finding addons selected", requestAddons, requestAddonsSelected);
+		//If admin requested, redirect to the manage subscription page
+		console.log('Just before finding addons selected', this.props.formJSON);
+		const requestAddons = this.props.formJSON
+			? PreProcessors.getRequestAddonsArray.default(this.props.formJSON)
+			: [];
+		const requestAddonsSelected = requestAddons
+			? requestAddons.filter((item) => {
+					return item.data && item.data.value;
+				})
+			: [];
+		console.log('after finding addons selected', requestAddons, requestAddonsSelected);
 		let needsCard =
 			(this.state.servicePrice > 0 &&
 				this.props.plan.type !== 'custom' &&
 				!this.state.hasCard &&
 				this.props.plan.trial_period_days <= 0) ||
-            (this.props.forceCard && !this.state.hasCard) ||
-            (this.state.servicePrice > 0 && this.props.plan.type !== 'custom' && !this.state.hasCard && this.props.plan.trial_period_days > 0 && requestAddonsSelected.length)||
-            this.props.plan.type === 'split';//split is an old type, no longer used, depreated.
+			(this.props.forceCard && !this.state.hasCard) ||
+			(this.state.servicePrice > 0 &&
+				this.props.plan.type !== 'custom' &&
+				!this.state.hasCard &&
+				this.props.plan.trial_period_days > 0 &&
+				requestAddonsSelected.length) ||
+			this.props.plan.type === 'split'; //split is an old type, no longer used, depreated.
 
 		let helpers = Object.assign(this.state, this.props);
 		helpers.updatePrice = self.updatePrice;

@@ -12,7 +12,7 @@ class Load extends React.Component {
     }
 
     render () {
-        if(this.props.loading){
+        if(this.props.loading && !this.props.loading.loading_id){
             return (
                 <div className={`page-loader ${this.props.className}`}>
                     <div className="lds-ellipsis"><div/><div/><div/><div/></div>
@@ -25,7 +25,7 @@ class Load extends React.Component {
 }
 function mapStateToProps(state) {
     return {
-        loading: state.loading
+        loading: state.loading,
     }
 }
 

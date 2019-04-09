@@ -6,7 +6,7 @@ class CardSection extends React.Component {
     render() {
         return (
             <div className="sb-form-group" id="card-element">
-                <label>Payment Info</label>
+                <label>Credit Card</label>
                 <CardElement style={{
                     base: {
                         color: '#32325d',
