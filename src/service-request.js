@@ -327,7 +327,7 @@ function Summary(props) {
 								<div className="fe--total-price-label">
 									<span
 										style={{ textTransform: 'capitalize' }}
-									>{`${intervallyText()} Recurring Payments`}</span>
+									>{`${intervallyText()} Recurring Payment`}</span>
 								</div>
 								<div className="fe--total-price-value">
 									<Price value={total} currency={currency} />

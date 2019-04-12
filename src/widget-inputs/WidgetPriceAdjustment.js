@@ -33,7 +33,7 @@ function Adjustment(props){
     }
     return (
         <div className="request-form-price-adjustment-wrapper">
-            {message}
+            <span className="_adjustment-text">{message}</span>
         </div>
     );
 

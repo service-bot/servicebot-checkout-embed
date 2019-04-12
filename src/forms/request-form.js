@@ -251,13 +251,16 @@ class ServiceRequestForm extends React.Component {
 				<ul className="step-selectors">
 					<li
 						className={`_step-selector ${step == 0 ? '_active' : ``}`}
-						onClick={() => {
+						onClick={async () => {
 							if (step != 0) {
+                                //TODO: try set step 0 first then, 
+                                await helpers.setBreadcrumbs(true);
 								const errors = this.props.handleSubmit();
-
-								if (!errors.password && !errors.references) {
+                                console.log("STEP ERRORS", errors);
+								if (!Object.keys(errors).length > 0) {
 									helpers.setStep(0);
-								}
+                                }
+                                helpers.setBreadcrumbs(false);
 							}
 						}}
 					>
@@ -266,13 +269,15 @@ class ServiceRequestForm extends React.Component {
 					{plan.type != 'custom' && requestAddons.length ? (
 						<li
 							className={`_step-selector ${step == 1 ? '_active' : ``}`}
-							onClick={() => {
+							onClick={async () => {
 								if (step != 1) {
+                                    await helpers.setBreadcrumbs(true);
 									const errors = this.props.handleSubmit();
-
-									if (!errors.password && !errors.references) {
+                                    console.log("STEP ERRORS", errors);
+									if (!Object.keys(errors).length > 0) {
 										helpers.setStep(1);
-									}
+                                    }
+                                    helpers.setBreadcrumbs(false);
 								}
 							}}
 						>
@@ -284,13 +289,15 @@ class ServiceRequestForm extends React.Component {
 					{plan.type != 'custom' && needsCard ? (
 						<li
 							className={`_step-selector ${step == 2 ? '_active' : ``}`}
-							onClick={() => {
+							onClick={async () => {
 								if (step != 2) {
+                                    await helpers.setBreadcrumbs(true);
 									const errors = this.props.handleSubmit();
 
-									if (!errors.password && !errors.references) {
+									if (!Object.keys(errors).length > 0) {
 										helpers.setStep(2);
-									}
+                                    }
+                                    helpers.setBreadcrumbs(false);
 								}
 							}}
 						>
@@ -428,7 +435,7 @@ class ServiceRequestForm extends React.Component {
 						<div className="rf--form-inner _step-1">
 							<div className="_left">
 								<div className="_heading-wrapper">
-									<h2>{`Addons`}</h2>
+									<h2>{`Add-Ons`}</h2>
 								</div>
 								<div className="_content_wrapper">
 									<FormSection name="references">
@@ -495,7 +502,7 @@ class ServiceRequestForm extends React.Component {
 							/>
 						</div>
 					)}
-					{typeof error == 'string' && <strong>{error}</strong>}
+					{typeof error == 'string' && <div className={`embed-errors ${error ? '_has-error':'_no-error'}`}><span className={`_error-message`}>{error}</span></div>}
 				</form>
 			</div>
 		);
@@ -554,15 +561,24 @@ class ServiceInstanceForm extends React.Component {
 			loading: true,
 			hasFund: false,
 			step: 0,
-			selectedAddons: 0
+            selectedAddons: 0,
+            breadcrumbs: false,
 		};
 		this.closeUserLoginModal = this.closeUserLoginModal.bind(this);
 		this.updatePrice = this.updatePrice.bind(this);
 		this.submissionPrep = this.submissionPrep.bind(this);
 		this.handleResponse = this.handleResponse.bind(this);
 		this.handleFailure = this.handleFailure.bind(this);
-		this.setSelectedAddons = this.setSelectedAddons.bind(this);
-	}
+        this.setSelectedAddons = this.setSelectedAddons.bind(this);
+        this.setBreadcrumbs = this.setBreadcrumbs.bind(this);
+    }
+    
+    setBreadcrumbs(state){
+        return new Promise((resolve, reject) => {
+      
+             this.setState({breadcrumbs: state}, () => {resolve(true)});
+      })
+    }
 
 	async componentDidMount() {
 		let headers = new Headers({
@@ -643,7 +659,8 @@ class ServiceInstanceForm extends React.Component {
 	}
 
 	async submissionPrep(values) {
-		console.log('SubmissionPrep -- props, values, formJSON', this.props, values, this.props.formJSON);
+        console.log('SubmissionPrep -- props, values, formJSON', this.props, values, this.props.formJSON);
+        
 		const requestAddons = PreProcessors.getRequestAddonsArray.default(this.props.formJSON);
 		const requestAddonsSelected = requestAddons
 			? requestAddons.filter((item) => {
@@ -676,7 +693,15 @@ class ServiceInstanceForm extends React.Component {
 			console.log('submission prep -- step 1');
 			this.props.stepForward();
 			throw ''; //stop the form from actually submitting
-		}
+        }
+        
+        console.log("Sumibssion Prep -- breadcrumbs", this.state.breadcrumbs)
+        if(this.state.breadcrumbs){
+            console.log("IM THROWING STUFF")
+            throw '';
+        }
+
+
 		this.props.setLoading({ is_loading: true, loading_id: 'submission_button' });
 
 		if (needsCard) {
@@ -782,7 +807,7 @@ class ServiceInstanceForm extends React.Component {
 		helpers.stepForward = this.props.stepForward;
 		helpers.stepBack = this.props.stepBack;
 		helpers.setStep = this.props.setStep;
-
+        helpers.setBreadcrumbs = this.setBreadcrumbs;
 		// }
 		helpers.step = this.props.step;
 		//Gets a token to populate token_id for instance request
